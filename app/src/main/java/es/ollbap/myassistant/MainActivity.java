@@ -10,15 +10,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
 import android.view.View;
 
 import android.view.Menu;
 import android.view.MenuItem;
 
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     private static final int SPEECH_REQUEST_CODE = 0;
+    private TextToSpeech mTts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,9 @@ public class MainActivity extends AppCompatActivity {
                     .setAction("Action", null).show();
             displaySpeechRecognizer();
         });
+
+        mTts = new TextToSpeech(this, status -> {});
+        mTts.setLanguage(Locale.US);
     }
 
     @Override
@@ -76,8 +82,10 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == SPEECH_REQUEST_CODE && resultCode == RESULT_OK) {
             List<String> results = data.getStringArrayListExtra(
                     RecognizerIntent.EXTRA_RESULTS);
-            String spokenText = results.get(0);
-            // Do something with spokenText
+
+            for (String result : results) {
+                mTts.speak(result, TextToSpeech.QUEUE_ADD, null, null);
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
